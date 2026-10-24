@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Catch Me Up: group chat recaps</title>
+<meta name="description" content="Missed the group chat? Drop in a WhatsApp export and get the plans, the drama and every time you got tagged.">
+<meta name="theme-color" content="#F2EFFF">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F2EFFF;
+  --surface: #FFFFFF;
+  --surface-2: #F8F6FF;
+  --ink: #1D1A39;
+  --muted: #6B6790;
+  --line: #DED8FB;
+  --violet: #5B3DF5;
+  --violet-soft: #E6E0FF;
+  --pink: #FF4F9A;
+  --pink-soft: #FFE1EE;
+  --mint: #0FB48A;
+  --mint-soft: #D7F7EC;
+  --sun: #F2A900;
+  --sun-soft: #FFF1C9;
+  --sky: #2F8FF0;
+  --sky-soft: #DCEEFF;
+  --shadow: 0 1px 0 rgba(29, 26, 57, .04), 0 12px 32px -12px rgba(61, 40, 170, .22);
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --ease-pop: cubic-bezier(.2, .9, .3, 1.25);
+  --ease-soft: cubic-bezier(.25, .8, .25, 1);
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15122B; --surface: #211D3E; --surface-2: #1B1834; --ink: #F1EEFF; --muted: #A7A2CF;
+    --line: #36305F; --violet: #8C75FF; --violet-soft: #2E2760; --pink: #FF6FAE; --pink-soft: #3D1F35;
+    --mint: #3BDDB0; --mint-soft: #173A35; --sun: #FFC93C; --sun-soft: #3A3120; --sky: #5CAEFF; --sky-soft: #1C2F4A;
+    --shadow: 0 1px 0 rgba(0,0,0,.2), 0 16px 40px -16px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15122B; --surface: #211D3E; --surface-2: #1B1834; --ink: #F1EEFF; --muted: #A7A2CF;
+  --line: #36305F; --violet: #8C75FF; --violet-soft: #2E2760; --pink: #FF6FAE; --pink-soft: #3D1F35;
+  --mint: #3BDDB0; --mint-soft: #173A35; --sun: #FFC93C; --sun-soft: #3A3120; --sky: #5CAEFF; --sky-soft: #1C2F4A;
+  --shadow: 0 1px 0 rgba(0,0,0,.2), 0 16px 40px -16px rgba(0,0,0,.6);
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 1rem; line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--violet); outline-offset: 3px; border-radius: 10px; }
+img, svg { max-width: 100%; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Top bar ---------- */
+.topbar {
+  max-width: 1120px; margin: 0 auto; padding: 1.25rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.brand { display: flex; align-items: center; gap: .6rem; font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; letter-spacing: -.02em; text-decoration: none; color: var(--ink); }
+.brand-mark { width: 34px; height: 34px; display: grid; place-items: center; background: var(--violet); color: #fff; border-radius: 12px 12px 12px 4px; }
+.brand-mark svg { width: 18px; height: 18px; }
+.privacy-note { font-size: .875rem; color: var(--muted); display: flex; gap: .4rem; align-items: center; }
+
+/* ---------- Screens ---------- */
+main { max-width: 1120px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+.screen { display: none; }
+.screen.is-active { display: block; animation: screenIn .5s var(--ease-soft) both; }
+.screen.is-leaving { display: block; animation: screenOut .25s ease-in both; }
+@keyframes screenIn { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes screenOut { to { opacity: 0; transform: translateY(-8px) scale(.99); } }
+
+/* ---------- Start screen ---------- */
+.start-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 3.5rem; align-items: center; padding-top: 2rem; }
+.intro h1 {
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(2.6rem, 6vw, 4.4rem);
+  line-height: .98; letter-spacing: -.04em; margin: 0 0 1.1rem; font-variation-settings: "opsz" 96;
+}
+.lede { font-size: 1.15rem; color: var(--muted); max-width: 34rem; margin: 0 0 2rem; }
+
+.field { border: 0; padding: 0; margin: 0 0 1.4rem; }
+.field legend, .field > label { display: block; padding: 0; font-weight: 700; margin-bottom: .55rem; font-size: .95rem; }
+.text-input {
+  width: 100%; max-width: 22rem; padding: .8rem 1rem; border: 2px solid var(--line); border-radius: 14px;
+  background: var(--surface); transition: border-color .2s;
+}
+.text-input:focus { border-color: var(--violet); outline: none; }
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .6rem; }
+.chips:empty { display: none; }
+.chip {
+  border: 2px solid var(--line); background: var(--surface); border-radius: 999px; padding: .35rem .85rem;
+  cursor: pointer; font-weight: 600; font-size: .9rem; transition: background .2s, border-color .2s, transform .2s var(--ease-pop);
+}
+.chip:hover { border-color: var(--violet); }
+.chip:active { transform: scale(.95); }
+.chip[aria-pressed="true"] { background: var(--violet); border-color: var(--violet); color: #fff; }
+
+.segmented { display: inline-flex; background: var(--surface); border: 2px solid var(--line); border-radius: 16px; padding: 4px; gap: 2px; flex-wrap: wrap; }
+.segmented input { position: absolute; opacity: 0; pointer-events: none; }
+.segmented label {
+  padding: .5rem .9rem; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: .92rem; color: var(--muted);
+  transition: background .25s var(--ease-soft), color .25s;
+}
+.segmented input:checked + label { background: var(--violet-soft); color: var(--ink); }
+.segmented input:focus-visible + label { outline: 3px solid var(--violet); outline-offset: 1px; }
+
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 2rem; }
+.btn {
+  display: inline-flex; align-items: center; gap: .55rem; border: 0; cursor: pointer; font-weight: 700;
+  border-radius: 18px 18px 18px 6px; padding: 1rem 1.6rem; font-size: 1.05rem;
+  transition: transform .25s var(--ease-pop), box-shadow .25s, background .2s, opacity .2s;
+}
+.btn-primary { background: var(--violet); color: #fff; box-shadow: 0 10px 24px -10px var(--violet); }
+.btn-primary:hover { transform: translateY(-2px); }
+.btn-primary:active { transform: translateY(0) scale(.97); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-link { background: none; padding: .5rem .25rem; color: var(--violet); border-radius: 8px; font-size: 1rem; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+.btn-ghost { background: var(--surface); border: 2px solid var(--line); padding: .6rem 1rem; font-size: .95rem; border-radius: 14px; }
+.btn-ghost:hover { border-color: var(--violet); }
+.hint { font-size: .9rem; color: var(--muted); margin: .9rem 0 0; }
+
+details.help { margin-top: 2rem; border-top: 2px dashed var(--line); padding-top: 1rem; max-width: 34rem; }
+details.help summary { cursor: pointer; font-weight: 700; list-style: none; display: flex; align-items: center; gap: .5rem; }
+details.help summary::-webkit-details-marker { display: none; }
+details.help summary::before { content: "+"; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 7px; background: var(--violet-soft); color: var(--violet); font-weight: 800; transition: transform .3s var(--ease-pop); }
+details.help[open] summary::before { transform: rotate(45deg); }
+details.help ol { margin: .8rem 0 0; padding-left: 1.2rem; color: var(--muted); }
+details.help li { margin-bottom: .3rem; }
+
+/* ---------- Phone / drop zone (the hero moment) ---------- */
+.phone {
+  position: relative; background: var(--surface); border-radius: 34px; box-shadow: var(--shadow);
+  border: 2px solid var(--line); overflow: hidden; cursor: pointer; display: flex; flex-direction: column;
+  min-height: 520px; transition: transform .35s var(--ease-pop), border-color .25s, box-shadow .3s;
+}
+.phone:hover { border-color: var(--violet); }
+.phone.is-dragging { transform: scale(1.02) rotate(-1deg); border-color: var(--violet); border-style: dashed; }
+.phone-head { display: flex; align-items: center; gap: .8rem; padding: 1rem 1.2rem; border-bottom: 2px solid var(--line); }
+.avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--sun-soft); display: grid; place-items: center; font-size: 1.3rem; flex: none; }
+.phone-head .meta { min-width: 0; flex: 1; }
+.phone-head strong { display: block; font-family: var(--font-display); font-size: 1.1rem; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.phone-head .meta span { font-size: .85rem; color: var(--muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.unread {
+  background: var(--pink); color: #fff; font-weight: 800; font-size: .85rem; border-radius: 999px; padding: .3rem .7rem;
+  white-space: nowrap; transition: transform .4s var(--ease-pop);
+}
+.unread.bump { animation: bump .5s var(--ease-pop); }
+@keyframes bump { 40% { transform: scale(1.25); } }
+.phone-body {
+  flex: 1; padding: 1.2rem; display: flex; flex-direction: column; justify-content: flex-end; gap: .55rem;
+  background-image: radial-gradient(var(--line) 1.2px, transparent 1.2px); background-size: 18px 18px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18%); mask-image: linear-gradient(to bottom, transparent 0, #000 18%);
+  overflow: hidden;
+}
+.msg { max-width: 82%; background: var(--surface-2); border: 1.5px solid var(--line); border-radius: 18px 18px 18px 5px; padding: .5rem .8rem; font-size: .92rem; line-height: 1.4; animation: msgIn .45s var(--ease-pop) both; }
+.msg.right { align-self: flex-end; background: var(--violet-soft); border-color: transparent; border-radius: 18px 18px 5px 18px; }
+.msg b { display: block; font-size: .78rem; color: var(--violet); margin-bottom: .1rem; }
+.msg.skel { height: 38px; background: var(--surface-2); }
+.msg.skel.right { background: var(--violet-soft); }
+@keyframes msgIn { from { opacity: 0; transform: translateY(10px) scale(.96); } }
+.phone-foot { padding: 1rem 1.2rem 1.2rem; display: flex; align-items: center; gap: .8rem; border-top: 2px solid var(--line); }
+.drop-cta { flex: 1; background: var(--surface-2); border: 2px dashed var(--line); border-radius: 999px; padding: .7rem 1.1rem; font-size: .93rem; color: var(--muted); }
+.drop-cta strong { color: var(--ink); }
+.send-dot { width: 46px; height: 46px; border-radius: 50%; background: var(--violet); color: #fff; display: grid; place-items: center; flex: none; }
+.phone.has-file .drop-cta { border-style: solid; border-color: var(--mint); color: var(--ink); }
+.paste-link { display: block; text-align: center; margin-top: .9rem; }
+
+/* ---------- Loading ---------- */
+.loading-wrap { display: grid; place-items: center; padding-top: 2rem; text-align: center; }
+.loader-phone {
+  width: min(380px, 100%); height: 440px; background: var(--surface); border: 2px solid var(--line); border-radius: 34px;
+  box-shadow: var(--shadow); overflow: hidden; position: relative; transition: transform .45s var(--ease-soft), opacity .45s, border-radius .45s;
+}
+.loader-phone .stream {
+  display: flex; flex-direction: column; gap: .5rem; padding: 1.2rem; text-align: left;
+  animation: stream var(--dur, 6s) linear infinite;
+}
+.loader-phone::before, .loader-phone::after { content: ""; position: absolute; left: 0; right: 0; height: 90px; z-index: 2; pointer-events: none; }
+.loader-phone::before { top: 0; background: linear-gradient(var(--surface), transparent); }
+.loader-phone::after { bottom: 0; background: linear-gradient(transparent, var(--surface)); }
+.loader-phone .msg { animation: none; max-width: 85%; }
+.loader-phone .msg.hit { background: var(--sun-soft); border-color: var(--sun); transition: background .3s; }
+@keyframes stream { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+.loader-phone.is-done { transform: scaleY(.18) scaleX(.6); border-radius: 60px; opacity: 0; }
+.status { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; letter-spacing: -.02em; margin: 1.8rem 0 .3rem; min-height: 2.2rem; }
+.status span { display: inline-block; animation: statusIn .4s var(--ease-soft) both; }
+@keyframes statusIn { from { opacity: 0; transform: translateY(8px); filter: blur(4px); } }
+.status-sub { color: var(--muted); margin: 0; }
+.typing { display: inline-flex; gap: 5px; margin-top: 1rem; }
+.typing i { width: 8px; height: 8px; border-radius: 50%; background: var(--violet); animation: dot 1.2s infinite ease-in-out; }
+.typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes dot { 0%, 60%, 100% { transform: translateY(0); opacity: .4; } 30% { transform: translateY(-6px); opacity: 1; } }
+
+/* ---------- Recap ---------- */
+.recap-bar { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; padding: 1rem 0 1.5rem; }
+.recap-bar .group { display: flex; align-items: center; gap: .8rem; }
+.recap-bar .group strong { display: block; font-family: var(--font-display); font-size: 1.25rem; letter-spacing: -.02em; }
+.recap-bar .group span { color: var(--muted); font-size: .9rem; }
+.recap-bar .tools { display: flex; gap: .6rem; flex-wrap: wrap; }
+
+.hero-bubble {
+  background: var(--violet); color: #fff; border-radius: 36px 36px 36px 10px; padding: clamp(1.6rem, 4vw, 2.8rem);
+  position: relative; overflow: hidden; margin-bottom: 1.5rem;
+}
+.hero-bubble .from { font-weight: 700; opacity: .8; margin: 0 0 .6rem; font-size: .95rem; }
+.hero-bubble h2 {
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(2rem, 5vw, 3.6rem); line-height: 1;
+  letter-spacing: -.035em; margin: 0 0 1rem; max-width: 18ch; font-variation-settings: "opsz" 96;
+}
+.hero-bubble .tldr { font-size: 1.15rem; max-width: 40rem; margin: 0; opacity: .95; }
+.vibe { margin-top: 1.6rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.4rem; }
+.vibe-label { display: flex; align-items: center; gap: .6rem; background: rgba(255,255,255,.16); padding: .45rem .9rem .45rem .5rem; border-radius: 999px; font-weight: 700; }
+.vibe-label .e { font-size: 1.5rem; line-height: 1; }
+.chaos { display: flex; align-items: center; gap: .7rem; font-size: .9rem; font-weight: 600; }
+.chaos-track { width: 160px; height: 10px; background: rgba(255,255,255,.2); border-radius: 99px; overflow: hidden; }
+.chaos-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--sun), var(--pink)); border-radius: 99px; transition: width 1.2s var(--ease-soft) .5s; }
+
+.tagged { margin-bottom: 1.5rem; }
+.board { columns: 2 340px; column-gap: 1.5rem; }
+.board > * { break-inside: avoid; margin-bottom: 1.5rem; }
+
+.section {
+  --tone: var(--violet); --tone-soft: var(--violet-soft);
+  background: var(--surface); border: 2px solid var(--line); border-radius: 28px 28px 28px 8px; padding: 1.4rem 1.5rem 1.2rem;
+}
+.section h3 { font-family: var(--font-display); font-size: 1.3rem; letter-spacing: -.02em; margin: 0 0 .9rem; display: flex; align-items: center; gap: .6rem; }
+.section h3 .ic { width: 36px; height: 36px; border-radius: 12px 12px 12px 4px; background: var(--tone-soft); display: grid; place-items: center; font-size: 1.1rem; }
+.section h3 .count { margin-left: auto; font-family: var(--font-body); font-size: .85rem; font-weight: 700; color: var(--tone); background: var(--tone-soft); padding: .15rem .6rem; border-radius: 99px; }
+.section.pink { --tone: var(--pink); --tone-soft: var(--pink-soft); }
+.section.mint { --tone: var(--mint); --tone-soft: var(--mint-soft); }
+.section.sun { --tone: var(--sun); --tone-soft: var(--sun-soft); }
+.section.sky { --tone: var(--sky); --tone-soft: var(--sky-soft); }
+.section.tagged-hot { border-color: var(--pink); box-shadow: 0 14px 34px -18px var(--pink); }
+
+.items { list-style: none; margin: 0; padding: 0; }
+.items > li { padding: .8rem 0; border-top: 1.5px solid var(--line); }
+.items > li:first-child { border-top: 0; padding-top: .1rem; }
+.item-title { font-weight: 700; margin: 0; }
+.item-text { margin: .15rem 0 0; color: var(--muted); }
+.meta-row { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
+.tag { font-size: .8rem; font-weight: 700; padding: .2rem .6rem; border-radius: 99px; background: var(--surface-2); border: 1.5px solid var(--line); color: var(--ink); }
+.tag.tone { background: var(--tone-soft); border-color: transparent; color: var(--tone); }
+.tag.warn { background: var(--pink); color: #fff; border-color: transparent; }
+.status-confirmed { background: var(--mint-soft); color: var(--mint); border-color: transparent; }
+.status-cancelled { text-decoration: line-through; }
+.who { font-weight: 700; color: var(--ink); }
+.empty { color: var(--muted); margin: 0; }
+.spice { letter-spacing: .1em; }
+
+.quote-card { background: var(--sun-soft); border-color: transparent; }
+.quote-card blockquote { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; line-height: 1.2; letter-spacing: -.02em; margin: 0 0 .7rem; }
+.quote-card blockquote::before { content: "“"; } .quote-card blockquote::after { content: "”"; }
+.quote-card p { margin: 0; color: var(--muted); }
+
+.todo-list { list-style: none; padding: 0; margin: 0; }
+.todo-list li { border-top: 1.5px solid var(--line); }
+.todo-list li:first-child { border-top: 0; }
+.todo-list label { display: flex; gap: .8rem; align-items: flex-start; padding: .65rem 0; cursor: pointer; }
+.todo-list input { appearance: none; width: 22px; height: 22px; border: 2px solid var(--line); border-radius: 8px; flex: none; margin-top: 1px; display: grid; place-items: center; transition: background .2s, border-color .2s; cursor: pointer; }
+.todo-list input:checked { background: var(--mint); border-color: var(--mint); }
+.todo-list input:checked::after { content: "✓"; color: #fff; font-weight: 800; font-size: .8rem; }
+.todo-list input:checked + span { text-decoration: line-through; color: var(--muted); }
+.todo-list span { transition: color .2s; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .8rem; margin-bottom: 1.1rem; }
+.stat { background: var(--surface-2); border-radius: 16px; padding: .8rem 1rem; }
+.stat strong { display: block; font-family: var(--font-display); font-size: 1.6rem; letter-spacing: -.03em; line-height: 1.1; }
+.stat span { color: var(--muted); font-size: .85rem; }
+.yappers { list-style: none; padding: 0; margin: 0; display: grid; gap: .55rem; }
+.yapper { display: grid; grid-template-columns: 7.5rem 1fr 2.5rem; gap: .7rem; align-items: center; font-size: .92rem; }
+.yapper .n { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.yapper .bar { height: 12px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+.yapper .bar i { display: block; height: 100%; width: 0; background: var(--sky); border-radius: 99px; transition: width 1s var(--ease-soft) .6s; }
+.yapper .c { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sub-h { font-weight: 700; margin: 0 0 .6rem; font-size: .95rem; }
+
+.demo-note { background: var(--sun-soft); border-radius: 16px; padding: .8rem 1rem; margin-bottom: 1.5rem; font-size: .95rem; }
+
+/* one orchestrated reveal for the recap */
+.reveal { animation: pop .6s var(--ease-pop) both; animation-delay: calc(var(--i, 0) * 80ms + 80ms); }
+@keyframes pop { from { opacity: 0; transform: translateY(18px) scale(.97); } }
+
+/* ---------- Dialog & toast ---------- */
+dialog {
+  border: 0; border-radius: 28px 28px 28px 8px; padding: 1.6rem; width: min(560px, calc(100% - 2rem));
+  background: var(--surface); color: var(--ink); box-shadow: var(--shadow);
+}
+dialog[open] { animation: screenIn .35s var(--ease-pop); }
+dialog::backdrop { background: rgba(21, 18, 43, .45); backdrop-filter: blur(4px); }
+dialog h2 { font-family: var(--font-display); margin: 0 0 .4rem; letter-spacing: -.02em; }
+dialog p { color: var(--muted); margin: 0 0 1rem; }
+dialog textarea { width: 100%; min-height: 220px; border: 2px solid var(--line); border-radius: 16px; padding: .9rem; background: var(--surface-2); resize: vertical; font-size: .9rem; }
+dialog textarea:focus { outline: none; border-color: var(--violet); }
+.dialog-actions { display: flex; justify-content: flex-end; gap: .8rem; margin-top: 1rem; }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 140%);
+  background: var(--ink); color: var(--bg); padding: .85rem 1.2rem; border-radius: 18px 18px 18px 6px; font-weight: 600;
+  max-width: calc(100% - 2rem); z-index: 50; transition: transform .45s var(--ease-pop); box-shadow: var(--shadow);
+}
+.toast.show { transform: translate(-50%, 0); }
+.toast.error { background: var(--pink); color: #fff; }
+
+footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 0 1.5rem 2rem; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .start-grid { grid-template-columns: 1fr; gap: 2rem; padding-top: .5rem; }
+  .phone { min-height: 380px; order: -1; }
+  .privacy-note { display: none; }
+}
+@media (max-width: 480px) {
+  main, .topbar { padding-left: 1rem; padding-right: 1rem; }
+  .yapper { grid-template-columns: 5.5rem 1fr 2rem; }
+  .actions .btn-primary { width: 100%; justify-content: center; }
+  .chaos-track { width: 110px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="./" aria-label="Catch Me Up home">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="18" cy="12" r="2.2"/></svg>
+    </span>
+    Catch Me Up
+  </a>
+  <span class="privacy-note">🔒 Chats are never stored</span>
+</header>
+
+<main>
+  <!-- START -->
+  <section id="screen-start" class="screen is-active" aria-labelledby="title">
+    <div class="start-grid">
+      <div class="intro">
+        <h1 id="title">Missed the group chat? Get the recap.</h1>
+        <p class="lede">Drop in a WhatsApp export. You'll get the plans, the drama, what got decided and every time someone tagged you.</p>
+
+        <form id="form" novalidate>
+          <div class="field">
+            <label for="me">Your name in the chat</label>
+            <input id="me" class="text-input" type="text" autocomplete="off" placeholder="e.g. Ananya" maxlength="60">
+            <div class="chips" id="peopleChips" aria-label="Pick your name"></div>
+          </div>
+
+          <fieldset class="field">
+            <legend>How far back?</legend>
+            <div class="segmented" role="radiogroup">
+              <input type="radio" name="range" id="r100" value="100"><label for="r100">Last 100</label>
+              <input type="radio" name="range" id="r300" value="300" checked><label for="r300">Last 300</label>
+              <input type="radio" name="range" id="r600" value="600"><label for="r600">Last 600</label>
+              <input type="radio" name="range" id="rall" value="all"><label for="rall">Everything</label>
+            </div>
+          </fieldset>
+
+          <fieldset class="field">
+            <legend>Recap style</legend>
+            <div class="segmented" role="radiogroup">
+              <input type="radio" name="tone" id="tBestie" value="bestie" checked><label for="tBestie">😌 Bestie</label>
+              <input type="radio" name="tone" id="tSpicy" value="spicy"><label for="tSpicy">🌶️ Spicy</label>
+              <input type="radio" name="tone" id="tFacts" value="facts"><label for="tFacts">📋 Just facts</label>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <button type="submit" class="btn btn-primary" id="goBtn" disabled>Catch me up</button>
+            <button type="button" class="btn btn-link" id="sampleBtn">Try with a sample chat</button>
+          </div>
+          <p class="hint" id="formHint">Add your chat export to get started.</p>
+        </form>
+
+        <details class="help">
+          <summary>How do I export a WhatsApp chat?</summary>
+          <ol>
+            <li>Open the group and tap its name at the top.</li>
+            <li>Scroll down and tap <strong>Export chat</strong> (on Android it's under ⋮ → More).</li>
+            <li>Choose <strong>Without media</strong>.</li>
+            <li>Save the .txt or .zip file and drop it here.</li>
+          </ol>
+        </details>
+      </div>
+
+      <div>
+        <div class="phone" id="dropzone" tabindex="0" role="button" aria-describedby="dropText" aria-label="Add your chat export file">
+          <div class="phone-head">
+            <div class="avatar" aria-hidden="true">🫶</div>
+            <div class="meta">
+              <strong id="groupName">Your group chat</strong>
+              <span id="memberLine">You, and way too many messages</span>
+            </div>
+            <span class="unread" id="unreadPill">400+ unread</span>
+          </div>
+          <div class="phone-body" id="previewBody" aria-hidden="true">
+            <div class="msg skel" style="width:58%"></div>
+            <div class="msg skel" style="width:72%"></div>
+            <div class="msg skel right" style="width:40%"></div>
+            <div class="msg skel" style="width:66%"></div>
+            <div class="msg skel" style="width:48%"></div>
+            <div class="msg skel right" style="width:62%"></div>
+            <div class="msg skel" style="width:54%"></div>
+          </div>
+          <div class="phone-foot">
+            <div class="drop-cta" id="dropText"><strong>Drop your export here</strong> or click to choose a .txt or .zip</div>
+            <div class="send-dot" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            </div>
+          </div>
+          <input type="file" id="fileInput" accept=".txt,.zip,text/plain,application/zip" hidden>
+        </div>
+        <button type="button" class="btn btn-link paste-link" id="pasteBtn">Or paste the chat as text</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOADING -->
+  <section id="screen-loading" class="screen" aria-live="polite">
+    <div class="loading-wrap">
+      <div class="loader-phone" id="loaderPhone"><div class="stream" id="stream"></div></div>
+      <p class="status" id="status"><span>Reading the chat</span></p>
+      <p class="status-sub" id="statusSub"></p>
+      <div class="typing" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+  </section>
+
+  <!-- RECAP -->
+  <section id="screen-recap" class="screen" aria-label="Your recap"></section>
+</main>
+
+<footer>Built with GenAI. Your chat is processed to make the recap and is never saved.</footer>
+
+<dialog id="pasteDialog" aria-labelledby="pasteTitle">
+  <form method="dialog" id="pasteForm">
+    <h2 id="pasteTitle">Paste your chat</h2>
+    <p>WhatsApp exports work best. Plain "Name: message" lines also work.</p>
+    <label for="pasteArea" class="sr-only">Chat text</label>
+    <textarea id="pasteArea" placeholder="12/10/26, 9:41 pm - Rohan: guys Goa is ON"></textarea>
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-ghost" id="pasteCancel">Cancel</button>
+      <button type="submit" class="btn btn-primary" id="pasteUse">Use this chat</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================
+   Catch Me Up — client
+   1. Parse WhatsApp exports in the browser
+   2. Compute stats locally
+   3. Send the trimmed transcript to /api/recap
+   4. Render the recap
+   ========================================================= */
+
+const $ = (s, r = document) => r.querySelector(s);
+const state = { messages: [], participants: [], groupName: "", isSample: false, last: null };
+const MAX_CHARS = 60000;
+
+/* ---------- Parsing ---------- */
+const HEAD = /^[\u200e\u200f\ufeff]*\[?(\d{1,4})[\/.\-](\d{1,2})[\/.\-](\d{1,4}),?\s+(\d{1,2})[:.](\d{2})(?:[:.]\d{2})?(?:[\s\u202f\u00a0]*([AaPp])\.?\s?[Mm]\.?)?\]?\s*(?:[-–]\s*)?/;
+const SENDER = /^([^:\n]{1,60}?):\s?([\s\S]*)$/;
+const SYSTEM_TEXT = /^(messages and calls are end-to-end encrypted|.*created (this )?group|.*changed (the|this) group|.*added you|.*security code changed)/i;
+const MEDIA = /<media omitted>|<attached:|\(file attached\)|\b(image|video|audio|sticker|gif|document) omitted\b/i;
+
+function parseChat(raw) {
+  const lines = raw.replace(/\r\n?/g, "\n").split("\n");
+  const out = [];
+  const dateParts = [];
+  let last = null;
+
+  for (const line of lines) {
+    const m = line.match(HEAD);
+    if (m) {
+      const rest = line.slice(m[0].length);
+      const s = rest.match(SENDER);
+      let hour = +m[4];
+      if (m[6]) hour = (hour % 12) + (/p/i.test(m[6]) ? 12 : 0);
+      if (!s) { last = null; continue; }              // system line (joined, left, encrypted...)
+      dateParts.push([m[1], m[2], m[3]]);
+      last = {
+        p: [m[1], m[2], m[3]], hour, min: m[5],
+        sender: s[1].replace(/[\u200e\u202a\u202c~]/g, "").trim(),
+        text: s[2].replace(/\u200e/g, "").trim(),
+      };
+      out.push(last);
+    } else if (last && line.trim()) {
+      last.text += "\n" + line.trim();                // multi-line message
+    }
+  }
+
+  // Fallback: plain "Name: message" lines
+  if (out.length < 3) {
+    out.length = 0;
+    for (const line of lines) {
+      const s = line.match(/^([^:\n]{1,40}):\s(.+)$/);
+      if (s) out.push({ p: null, hour: null, min: null, sender: s[1].trim(), text: s[2].trim() });
+    }
+  }
+
+  // Work out date order: dd/mm vs mm/dd
+  const dayFirst = dateParts.some(p => p[0].length < 4 && +p[0] > 12) ? true
+                 : dateParts.some(p => +p[1] > 12) ? false : true;
+
+  for (const msg of out) {
+    msg.media = MEDIA.test(msg.text);
+    msg.deleted = /^(this message was deleted|you deleted this message)$/i.test(msg.text);
+    if (msg.p) {
+      let [a, b, c] = msg.p.map(Number);
+      let y, mo, d;
+      if (msg.p[0].length === 4) { y = a; mo = b; d = c; }
+      else { y = c < 100 ? 2000 + c : c; [d, mo] = dayFirst ? [a, b] : [b, a]; }
+      msg.date = new Date(y, mo - 1, d, msg.hour, +msg.min);
+      msg.stamp = `${String(d).padStart(2, "0")}/${String(mo).padStart(2, "0")} ${String(msg.hour).padStart(2, "0")}:${msg.min}`;
+    }
+    delete msg.p;
+  }
+
+  const messages = out.filter(m => !m.deleted && !SYSTEM_TEXT.test(m.text));
+  const counts = {};
+  messages.forEach(m => counts[m.sender] = (counts[m.sender] || 0) + 1);
+  const participants = Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count }));
+  return { messages, participants };
+}
+
+function groupNameFromFile(name) {
+  const m = name.match(/WhatsApp Chat (?:with|-)\s*(.+?)(?:\.txt|\.zip)?$/i);
+  return m ? m[1].trim() : "";
+}
+
+/* ---------- Selecting & stats ---------- */
+function selectedMessages() {
+  const r = document.querySelector('input[name="range"]:checked').value;
+  return r === "all" ? state.messages : state.messages.slice(-Number(r));
+}
+
+function buildTranscript(msgs) {
+  let lines = msgs.map(m => {
+    const t = m.media ? "[media]" : m.text.slice(0, 500).replace(/\n/g, " / ");
+    return `${m.stamp ? "[" + m.stamp + "] " : ""}${m.sender}: ${t}`;
+  });
+  let text = lines.join("\n");
+  while (text.length > MAX_CHARS && lines.length > 1) { lines = lines.slice(Math.ceil(lines.length * 0.1)); text = lines.join("\n"); }
+  return text;
+}
+
+function computeStats(msgs, me) {
+  const counts = {}, emojis = {}, hours = {};
+  let media = 0, youCameUp = 0;
+  const meKey = (me || "").toLowerCase().split(/\s+/)[0];
+  for (const m of msgs) {
+    counts[m.sender] = (counts[m.sender] || 0) + 1;
+    if (m.media) media++;
+    if (m.hour != null) hours[m.hour] = (hours[m.hour] || 0) + 1;
+    for (const e of m.text.match(/\p{Extended_Pictographic}/gu) || []) emojis[e] = (emojis[e] || 0) + 1;
+    if (meKey.length > 2 && m.sender.toLowerCase().split(/\s+/)[0] !== meKey && m.text.toLowerCase().includes(meKey)) youCameUp++;
+  }
+  const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const topEmoji = Object.entries(emojis).sort((a, b) => b[1] - a[1])[0];
+  const busy = Object.entries(hours).sort((a, b) => b[1] - a[1])[0];
+  const fmtHour = h => { h = +h; const s = h >= 12 ? "pm" : "am"; return `${h % 12 || 12} ${s}`; };
+  return {
+    total: msgs.length, people: Object.keys(counts).length, media, youCameUp, top,
+    topEmoji: topEmoji ? topEmoji[0] : "—", busiest: busy ? fmtHour(busy[0]) : "—",
+  };
+}
+
+/* ---------- File handling ---------- */
+async function readFile(file) {
+  if (/\.zip$/i.test(file.name) || file.type.includes("zip")) {
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
+    const zip = await JSZip.loadAsync(file);
+    const entry = Object.values(zip.files).find(f => /\.txt$/i.test(f.name) && !f.dir);
+    if (!entry) throw new Error("That zip has no chat .txt file inside.");
+    return entry.async("string");
+  }
+  return file.text();
+}
+function loadScript(src) {
+  if (window.JSZip) return Promise.resolve();
+  return new Promise((res, rej) => {
+    const s = document.createElement("script"); s.src = src; s.onload = res;
+    s.onerror = () => rej(new Error("Couldn't load the zip reader. Unzip the file and drop the .txt instead."));
+    document.head.appendChild(s);
+  });
+}
+
+function loadChat(text, { fileName = "", isSample = false, groupName = "" } = {}) {
+  const parsed = parseChat(text);
+  if (parsed.messages.length < 3) {
+    toast("That doesn't look like a chat export. Try a WhatsApp .txt file or paste the chat.", true);
+    return;
+  }
+  state.messages = parsed.messages;
+  state.participants = parsed.participants;
+  state.groupName = groupName || groupNameFromFile(fileName) || "Your group chat";
+  state.isSample = isSample;
+  renderPreview();
+  renderChips();
+  updateForm();
+}
+
+/* ---------- Start screen UI ---------- */
+function renderPreview() {
+  const body = $("#previewBody");
+  const me = $("#me").value.trim().toLowerCase();
+  body.innerHTML = "";
+  state.messages.slice(-7).forEach((m, i) => {
+    const d = document.createElement("div");
+    const mine = me && m.sender.toLowerCase() === me;
+    d.className = "msg" + (mine ? " right" : "");
+    d.style.animationDelay = i * 60 + "ms";
+    d.innerHTML = `${mine ? "" : `<b>${esc(m.sender)}</b>`}${esc(m.media ? "📎 Media" : trunc(m.text, 90))}`;
+    body.appendChild(d);
+  });
+  $("#groupName").textContent = state.groupName;
+  $("#memberLine").textContent = `${state.participants.length} people, ${state.messages.length.toLocaleString()} messages`;
+  const pill = $("#unreadPill");
+  pill.textContent = `${state.messages.length.toLocaleString()} messages`;
+  pill.classList.remove("bump"); void pill.offsetWidth; pill.classList.add("bump");
+  $("#dropzone").classList.add("has-file");
+  $("#dropText").innerHTML = `<strong>Chat loaded.</strong> Click to swap it for another`;
+}
+
+function renderChips() {
+  const wrap = $("#peopleChips");
+  wrap.innerHTML = "";
+  state.participants.slice(0, 12).forEach(p => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = p.name;
+    b.setAttribute("aria-pressed", String($("#me").value.trim() === p.name));
+    b.onclick = () => { $("#me").value = p.name; syncChips(); renderPreview(); updateForm(); };
+    wrap.appendChild(b);
+  });
+}
+function syncChips() {
+  document.querySelectorAll("#peopleChips .chip").forEach(c => c.setAttribute("aria-pressed", String(c.textContent === $("#me").value.trim())));
+}
+
+function updateForm() {
+  const hasChat = state.messages.length > 0;
+  const hasName = $("#me").value.trim().length > 0;
+  $("#goBtn").disabled = !(hasChat && hasName);
+  $("#formHint").textContent = !hasChat ? "Add your chat export to get started."
+    : !hasName ? "Pick your name so we know who got tagged."
+    : `Ready. We'll recap ${selectedMessages().length.toLocaleString()} messages.`;
+}
+
+/* ---------- Screens ---------- */
+let current = "screen-start";
+function show(id) {
+  if (id === current) return;
+  $("#toast").classList.remove("show");
+  const from = document.getElementById(current), to = document.getElementById(id);
+  from.classList.remove("is-active"); from.classList.add("is-leaving");
+  setTimeout(() => {
+    from.classList.remove("is-leaving");
+    to.classList.add("is-active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    current = id;
+  }, 240);
+}
+
+/* ---------- Loading ---------- */
+let statusTimer;
+function startLoading(msgs, me) {
+  const stream = $("#stream");
+  const sample = msgs.slice(-30);
+  const meKey = (me || "").toLowerCase().split(/\s+/)[0];
+  const html = sample.map(m => {
+    const hit = meKey.length > 2 && m.text.toLowerCase().includes(meKey);
+    return `<div class="msg${hit ? " hit" : ""}"><b>${esc(m.sender)}</b>${esc(m.media ? "📎 Media" : trunc(m.text, 70))}</div>`;
+  }).join("");
+  stream.innerHTML = html + html;                         // doubled for a seamless loop
+  stream.style.setProperty("--dur", Math.max(5, sample.length * 0.35) + "s");
+  $("#loaderPhone").classList.remove("is-done");
+
+  const steps = [
+    `Reading ${msgs.length.toLocaleString()} messages`,
+    "Spotting the plans", "Finding the drama",
+    `Checking who tagged ${me || "you"}`, "Picking the best moment", "Writing your recap",
+  ];
+  let i = 0;
+  const set = t => { $("#status").innerHTML = `<span>${esc(t)}</span>`; };
+  set(steps[0]);
+  $("#statusSub").textContent = state.groupName;
+  clearInterval(statusTimer);
+  statusTimer = setInterval(() => { i = Math.min(i + 1, steps.length - 1); set(steps[i]); }, 1600);
+}
+function stopLoading() { clearInterval(statusTimer); $("#loaderPhone").classList.add("is-done"); }
+
+/* ---------- Main flow ---------- */
+async function catchUp() {
+  const me = $("#me").value.trim();
+  const tone = document.querySelector('input[name="tone"]:checked').value;
+  const msgs = selectedMessages();
+  const stats = computeStats(msgs, me);
+
+  show("screen-loading");
+  setTimeout(() => startLoading(msgs, me), 250);
+  const minWait = new Promise(r => setTimeout(r, 2600));
+
+  let recap, demo = false;
+  try {
+    const res = await fetch("api/recap", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        transcript: buildTranscript(msgs), me, tone, groupName: state.groupName,
+        participants: state.participants.slice(0, 12).map(p => p.name),
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(data.error || `Server error ${res.status}`), { status: res.status });
+    recap = data;
+  } catch (err) {
+    if (state.isSample) { recap = SAMPLE_RECAP; demo = true; }
+    else {
+      await minWait; stopLoading();
+      setTimeout(() => show("screen-start"), 300);
+      const offline = err instanceof TypeError || err.status === 404 || err.status === 405;
+      toast(offline ? "Can't reach the recap server. Deploy with an API key (see README) or try the sample chat." : err.message, true);
+      return;
+    }
+  }
+  await minWait;
+  stopLoading();
+  state.last = { recap, stats, me };
+  setTimeout(() => { renderRecap(recap, stats, me, demo); show("screen-recap"); }, 380);
+}
+
+/* ---------- Recap rendering ---------- */
+function renderRecap(r, s, me, demo) {
+  let i = 1;
+  const idx = () => `style="--i:${i++}"`;
+  const tagged = r.mentions || [];
+  const needReply = tagged.filter(m => m.needsReply).length;
+
+  const mentionsSection = `
+    <section class="section pink reveal tagged ${tagged.length ? "tagged-hot" : ""}" ${idx()}>
+      <h3><span class="ic">📣</span>You got tagged <span class="count">${tagged.length}</span></h3>
+      ${tagged.length ? `<ul class="items">${tagged.map(m => `
+        <li>
+          <p class="item-title"><span class="who">${esc(m.from)}</span></p>
+          <p class="item-text">${esc(m.what)}</p>
+          <div class="meta-row">${m.needsReply ? `<span class="tag warn">Needs a reply</span>` : ""}${m.time ? `<span class="tag">${esc(m.time)}</span>` : ""}</div>
+        </li>`).join("")}</ul>`
+      : `<p class="empty">Nobody tagged you. You're off the hook.</p>`}
+    </section>`;
+
+  const plans = section("mint", "📅", "Plans", r.plans, p => `
+      <p class="item-title">${esc(p.what)}</p>
+      ${[p.when && `🕒 ${p.when}`, p.where && `📍 ${p.where}`].filter(Boolean).map(t => `<p class="item-text">${esc(t)}</p>`).join("")}
+      <div class="meta-row">
+        <span class="tag status-${p.status} ${p.status === "confirmed" ? "" : "tone"}">${esc(cap(p.status))}</span>
+        ${(p.who || []).map(w => `<span class="tag">${esc(w)}</span>`).join("")}
+      </div>`, "No plans were made. Classic.");
+
+  const decisions = section("", "✅", "Decided", r.decisions, d => `
+      <p class="item-title">${esc(d.what)}</p>
+      ${d.by ? `<p class="item-text">by ${esc(d.by)}</p>` : ""}`, "Nothing got decided yet.");
+
+  const drama = section("sun", "🍿", "The drama", r.drama, d => `
+      <p class="item-title">${esc(d.title)} <span class="spice" aria-label="spice level ${d.spice} of 3">${"🌶️".repeat(d.spice)}</span></p>
+      <p class="item-text">${esc(d.summary)}</p>
+      ${(d.people || []).length ? `<div class="meta-row">${d.people.map(p => `<span class="tag">${esc(p)}</span>`).join("")}</div>` : ""}`,
+      "Zero drama. Suspiciously peaceful.");
+
+  const highlight = r.highlight ? `
+    <section class="section quote-card reveal" ${idx()}>
+      <h3><span class="ic" style="background:var(--surface)">🏆</span>Best moment</h3>
+      <blockquote>${esc(r.highlight.quote)}</blockquote>
+      <p><span class="who">${esc(r.highlight.by)}</span>${r.highlight.why ? `. ${esc(r.highlight.why)}` : ""}</p>
+    </section>` : "";
+
+  const todo = (r.todo || []).length ? `
+    <section class="section mint reveal" ${idx()}>
+      <h3><span class="ic">📝</span>Your to-do <span class="count">${r.todo.length}</span></h3>
+      <ul class="todo-list">${r.todo.map(t => `<li><label><input type="checkbox"><span>${esc(t)}</span></label></li>`).join("")}</ul>
+    </section>` : "";
+
+  const maxTop = s.top[0] ? s.top[0][1] : 1;
+  const stats = `
+    <section class="section sky reveal" ${idx()}>
+      <h3><span class="ic">📊</span>By the numbers</h3>
+      <div class="stats-grid">
+        <div class="stat"><strong>${s.total.toLocaleString()}</strong><span>messages</span></div>
+        <div class="stat"><strong>${s.busiest}</strong><span>busiest hour</span></div>
+        <div class="stat"><strong>${s.topEmoji}</strong><span>top emoji</span></div>
+        <div class="stat"><strong>${s.youCameUp}</strong><span>times you came up</span></div>
+      </div>
+      <p class="sub-h">Top yappers</p>
+      <ul class="yappers">${s.top.map(([n, c]) => `
+        <li class="yapper"><span class="n">${esc(n)}</span><span class="bar"><i data-w="${Math.round(c / maxTop * 100)}"></i></span><span class="c">${c}</span></li>`).join("")}
+      </ul>
+    </section>`;
+
+  function section(tone, icon, title, list, row, empty) {
+    list = list || [];
+    return `
+      <section class="section ${tone} reveal" ${idx()}>
+        <h3><span class="ic">${icon}</span>${title}${list.length ? ` <span class="count">${list.length}</span>` : ""}</h3>
+        ${list.length ? `<ul class="items">${list.map(x => `<li>${row(x)}</li>`).join("")}</ul>` : `<p class="empty">${empty}</p>`}
+      </section>`;
+  }
+
+  const hero = `
+    <article class="hero-bubble reveal" style="--i:0">
+      <p class="from">Recap for ${esc(me)}${needReply ? `, ${needReply} ${needReply === 1 ? "person is" : "people are"} waiting on you` : ""}</p>
+      <h2>${esc(r.headline)}</h2>
+      <p class="tldr">${esc(r.tldr)}</p>
+      <div class="vibe">
+        <span class="vibe-label"><span class="e">${esc(r.vibe.emoji)}</span>${esc(r.vibe.label)}</span>
+        <span class="chaos">Chaos level
+          <span class="chaos-track" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${r.vibe.chaos}" aria-label="Chaos level">
+            <span class="chaos-fill" style="display:block" data-w="${r.vibe.chaos}"></span>
+          </span>${r.vibe.chaos}%
+        </span>
+      </div>
+    </article>`;
+
+  const bar = `
+    <div class="recap-bar">
+      <div class="group"><div class="avatar" aria-hidden="true">🫶</div>
+        <div><strong>${esc(state.groupName)}</strong><span>${s.total.toLocaleString()} messages from ${s.people} people</span></div>
+      </div>
+      <div class="tools">
+        <button class="btn btn-ghost" id="copyBtn" type="button">📋 Copy recap</button>
+        ${navigator.share ? `<button class="btn btn-ghost" id="shareBtn" type="button">↗ Share</button>` : ""}
+        <button class="btn btn-ghost" id="againBtn" type="button">New recap</button>
+      </div>
+    </div>`;
+
+  const note = demo ? `<p class="demo-note">This is a saved example recap. Deploy with an API key to recap your own chats.</p>` : "";
+
+  // Mentions go first when they exist, since that's what the reader needs to act on.
+  const board = tagged.length
+    ? mentionsSection + `<div class="board">${plans}${drama}${decisions}${highlight}${todo}${stats}</div>`
+    : `<div class="board">${plans}${drama}${decisions}${highlight}${mentionsSection.replace(" tagged", "")}${todo}${stats}</div>`;
+
+  $("#screen-recap").innerHTML = bar + note + hero + board;
+
+  requestAnimationFrame(() => setTimeout(() => {
+    document.querySelectorAll("#screen-recap [data-w]").forEach(el => el.style.width = el.dataset.w + "%");
+  }, 300));
+
+  $("#copyBtn").onclick = async () => {
+    try { await navigator.clipboard.writeText(recapText(r)); toast("Recap copied. Paste it anywhere."); }
+    catch { toast("Couldn't copy. Select the text and copy it manually.", true); }
+  };
+  const sb = $("#shareBtn");
+  if (sb) sb.onclick = () => navigator.share({ title: r.headline, text: recapText(r) }).catch(() => {});
+  $("#againBtn").onclick = () => show("screen-start");
+}
+
+function recapText(r) {
+  const L = [`*${r.headline}*`, r.tldr, ""];
+  if (r.mentions?.length) L.push("*📣 You got tagged*", ...r.mentions.map(m => `• ${m.from}: ${m.what}`), "");
+  if (r.plans?.length) L.push("*📅 Plans*", ...r.plans.map(p => `• ${p.what}${p.when ? ` (${p.when})` : ""}${p.where ? ` at ${p.where}` : ""}`), "");
+  if (r.decisions?.length) L.push("*✅ Decided*", ...r.decisions.map(d => `• ${d.what}`), "");
+  if (r.drama?.length) L.push("*🍿 Drama*", ...r.drama.map(d => `• ${d.title}: ${d.summary}`), "");
+  if (r.todo?.length) L.push("*📝 To-do*", ...r.todo.map(t => `• ${t}`), "");
+  L.push("Made with Catch Me Up");
+  return L.join("\n");
+}
+
+/* ---------- Helpers ---------- */
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function trunc(s, n) { return s.length > n ? s.slice(0, n - 1) + "…" : s; }
+function cap(s) { return s ? s[0].toUpperCase() + s.slice(1) : ""; }
+let toastTimer;
+function toast(msg, error = false) {
+  const t = $("#toast");
+  t.textContent = msg; t.classList.toggle("error", error); t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 4200);
+}
+
+/* ---------- Events ---------- */
+const dz = $("#dropzone"), fi = $("#fileInput");
+dz.addEventListener("click", () => fi.click());
+dz.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fi.click(); } });
+["dragenter", "dragover"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add("is-dragging"); }));
+["dragleave", "drop"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove("is-dragging"); }));
+dz.addEventListener("drop", e => { const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
+fi.addEventListener("change", () => { if (fi.files[0]) handleFile(fi.files[0]); fi.value = ""; });
+
+async function handleFile(file) {
+  if (file.size > 25 * 1024 * 1024) return toast("That file is over 25 MB. Export the chat without media.", true);
+  try { loadChat(await readFile(file), { fileName: file.name }); }
+  catch (e) { toast(e.message || "Couldn't read that file.", true); }
+}
+
+$("#me").addEventListener("input", () => { syncChips(); updateForm(); });
+document.querySelectorAll('input[name="range"]').forEach(r => r.addEventListener("change", updateForm));
+$("#form").addEventListener("submit", e => { e.preventDefault(); if (!$("#goBtn").disabled) catchUp(); });
+
+$("#sampleBtn").addEventListener("click", () => {
+  loadChat(SAMPLE_CHAT, { isSample: true, groupName: "Goa Trip 🌴" });
+  $("#me").value = "Ananya"; syncChips(); renderPreview(); updateForm();
+  toast("Sample chat loaded. You're Ananya.");
+});
+
+const dlg = $("#pasteDialog");
+$("#pasteBtn").addEventListener("click", () => { dlg.showModal(); $("#pasteArea").focus(); });
+$("#pasteCancel").addEventListener("click", () => dlg.close());
+$("#pasteForm").addEventListener("submit", () => {
+  const t = $("#pasteArea").value;
+  if (t.trim()) loadChat(t, { groupName: "Pasted chat" });
+});
+
+/* ---------- Sample data ---------- */
+const SAMPLE_CHAT = `14/11/26, 6:02 pm - Messages and calls are end-to-end encrypted.
+14/11/26, 6:02 pm - Rohan: GUYS. Goa is happening. No backing out this time 🌴
+14/11/26, 6:03 pm - Kavya: finally!! dates??
+14/11/26, 6:03 pm - Rohan: 18 to 21 Dec. Everyone free?
+14/11/26, 6:04 pm - Meera: yesss I'm in 🙌
+14/11/26, 6:05 pm - Arjun: in. but not taking a 14 hour bus again
+14/11/26, 6:05 pm - Kavya: train then
+14/11/26, 6:06 pm - Rohan: @Ananya you in? need your leave dates confirmed by tonight
+14/11/26, 6:10 pm - Arjun: she's probably in a meeting lol
+14/11/26, 6:12 pm - Meera: ok stay options. North Goa villa vs Anjuna hostel
+14/11/26, 6:12 pm - Meera: <Media omitted>
+14/11/26, 6:13 pm - Meera: <Media omitted>
+14/11/26, 6:14 pm - Rohan: villa is 18k a night 💀
+14/11/26, 6:15 pm - Kavya: split 5 ways it's fine??
+14/11/26, 6:16 pm - Rohan: Kavya it is NOT fine. some of us are on intern stipends
+14/11/26, 6:17 pm - Kavya: you literally bought new AirPods last week
+14/11/26, 6:17 pm - Rohan: that was a SALE
+14/11/26, 6:18 pm - Arjun: 🍿🍿🍿
+14/11/26, 6:19 pm - Meera: ok ok calm down. Anjuna has private rooms, 2.4k per person per night, pool included
+14/11/26, 6:21 pm - Kavya: fine. but I'm not sharing a bathroom with Arjun
+14/11/26, 6:21 pm - Arjun: rude but fair
+14/11/26, 6:23 pm - Rohan: vote. 👍 for Anjuna
+14/11/26, 6:23 pm - Meera: 👍
+14/11/26, 6:23 pm - Arjun: 👍
+14/11/26, 6:24 pm - Kavya: 👍 (under protest)
+14/11/26, 6:25 pm - Rohan: Anjuna it is. I'll book tonight
+14/11/26, 6:30 pm - Meera: train tickets open tomorrow 8 am. Arjun you have the fastest IRCTC fingers
+14/11/26, 6:31 pm - Arjun: I was born for tatkal
+14/11/26, 6:33 pm - Kavya: also packing list. who's bringing the speaker
+14/11/26, 6:34 pm - Meera: Ananya has the good JBL one
+14/11/26, 6:34 pm - Meera: @Ananya bring the speaker pls 🙏
+14/11/26, 6:40 pm - Rohan: booked! everyone send me 7,200 (3 nights)
+14/11/26, 6:41 pm - Rohan: Ananya you owe me from Pondy too btw, that's 7,200 + 1,500
+14/11/26, 6:42 pm - Arjun: Rohan really said interest 💀
+14/11/26, 6:45 pm - Kavya: sorry for snapping earlier Rohan
+14/11/26, 6:46 pm - Rohan: all good. AirPods were not on sale btw
+14/11/26, 6:46 pm - Kavya: I KNEW IT
+14/11/26, 6:47 pm - Meera: 😂😂😂
+14/11/26, 6:50 pm - Meera: dinner plan for night 1: Thalassa? sunset view
+14/11/26, 6:51 pm - Arjun: if it's not decided by then I'm eating at the shack next door
+14/11/26, 6:52 pm - Rohan: let's decide once we reach`;
+
+const SAMPLE_RECAP = {
+  headline: "Goa is ON and Anjuna won the vote",
+  tldr: "The squad locked in Goa for 18 to 21 December. After a budget showdown over an 18k villa, everyone voted for private rooms in Anjuna, and Rohan already booked them. Train tickets go on sale tomorrow at 8 am.",
+  vibe: { emoji: "🌴", label: "Chaotic but wholesome", chaos: 64 },
+  mentions: [
+    { from: "Rohan", what: "Wants your leave dates confirmed by tonight.", needsReply: true, time: "6:06 pm" },
+    { from: "Meera", what: "Asked you to bring your JBL speaker.", needsReply: true, time: "6:34 pm" },
+    { from: "Rohan", what: "Says you owe ₹7,200 for the stay plus ₹1,500 from the Pondy trip.", needsReply: false, time: "6:41 pm" },
+  ],
+  plans: [
+    { what: "Goa trip", when: "18 to 21 Dec", where: "Anjuna, North Goa", who: ["Everyone"], status: "confirmed" },
+    { what: "Book train tickets", when: "Tomorrow, 8 am", where: "IRCTC", who: ["Arjun"], status: "confirmed" },
+    { what: "Night 1 dinner at Thalassa", when: "18 Dec", where: "Thalassa", who: [], status: "tentative" },
+  ],
+  decisions: [
+    { what: "Stay at Anjuna private rooms (₹2,400 per person per night, pool included)", by: "group vote" },
+    { what: "Travel by train, not bus", by: "the group" },
+  ],
+  drama: [
+    { title: "The villa budget war", summary: "Kavya pushed for the 18k villa, Rohan pushed back on stipend budgets, and a side argument about AirPods broke out. Kavya apologised later.", people: ["Kavya", "Rohan"], spice: 2 },
+  ],
+  highlight: { quote: "AirPods were not on sale btw", by: "Rohan", why: "Admitted it after the peace treaty." },
+  todo: ["Confirm your leave dates with Rohan tonight", "Send Rohan ₹8,700", "Pack the JBL speaker"],
+};
+</script>
+</body>
+</html>

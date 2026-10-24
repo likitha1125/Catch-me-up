@@ -1,0 +1,10 @@
+{
+  "name": "catch-me-up",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Group chat recaps with GenAI: plans, drama, decisions and mentions from a WhatsApp export.",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "engines": { "node": ">=18" }
+}

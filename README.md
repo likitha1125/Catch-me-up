@@ -4,6 +4,8 @@
 
 Drop in a WhatsApp chat export and get a fun, structured recap: the plans that were made, what got decided, the drama, every time someone tagged you, and a to-do list of what you need to do now.
 
+live link: https://catch-me-up.netlify.app/
+
 ## Features
 
 - **Upload or paste**: WhatsApp `.txt` or `.zip` exports (Android and iPhone formats), or plain `Name: message` text.
